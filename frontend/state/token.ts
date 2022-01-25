@@ -25,11 +25,32 @@ function generateLeaf(address: string, value: string): Buffer {
 // Setup merkle tree
 const merkleTree = new MerkleTree(
   // Generate leafs
-  Object.entries(config.airdrop).map(([address, tokens]) =>
-    generateLeaf(
-      ethers.utils.getAddress(address),
-      ethers.utils.parseUnits(tokens.toString(), config.decimals).toString()
-    )
+  Object.entries(config.airdrop).map(([address, tokens]) => {
+    let node
+    switch (config.flavor) {
+      case 'ERC20':
+        node = generateLeaf(
+          ethers.utils.getAddress(address),
+          ethers.utils.parseUnits(tokens.toString(), config.decimals).toString()
+        )
+        break;
+      
+      case 'ERC1155':
+        node = generateLeaf(
+          ethers.utils.getAddress(address),
+          tokens.toString()
+        )
+        break;
+    
+      default:
+        node = generateLeaf(
+          ethers.utils.getAddress(address),
+          ethers.utils.parseUnits(tokens.toString(), config.decimals).toString()
+        )
+        break;
+    }
+    return node
+  }
   ),
   // Hashing function
   keccak256,
@@ -76,6 +97,8 @@ function useToken() {
    * @returns {number} of tokens claimable
    */
   const getAirdropAmount = (address: string): number => {
+
+    address = ethers.utils.getAddress(address)
     // If address is in airdrop
     if (address in config.airdrop) {
       // Return number of tokens available
@@ -109,10 +132,26 @@ function useToken() {
     // Get properly formatted address
     const formattedAddress: string = ethers.utils.getAddress(address);
     // Get tokens for address
-    const numTokens: string = ethers.utils
-      .parseUnits(config.airdrop[address].toString(), config.decimals)
-      .toString();
-
+    let tempNum
+    switch (config.flavor) {
+      case 'ERC20':
+        tempNum = ethers.utils
+        .parseUnits(config.airdrop[ethers.utils.getAddress(address)].toString(), config.decimals)
+        .toString();
+        break;
+      
+      case 'ERC1155':
+        tempNum = config.airdrop[ethers.utils.getAddress(address)].toString()
+        break;
+    
+      default:
+        tempNum = ethers.utils
+        .parseUnits(config.airdrop[ethers.utils.getAddress(address)].toString(), config.decimals)
+        .toString();
+        break;
+    }
+    const numTokens: string = tempNum
+    
     // Generate hashed leaf from address
     const leaf: Buffer = generateLeaf(formattedAddress, numTokens);
     // Generate airdrop proof

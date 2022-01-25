@@ -74,6 +74,6 @@ contract MerkleClaimERC1155 is ERC1155 {
   /// @param id the tokenID used to return the uri
   /// @dev update this function to fit your own requirements
   function uri(uint256 id) public view override returns (string memory) {
-    return "<RETURN YOUR URI HERE>";
+    return "ipfs://QmY3wiHvppVDqTyafZ2Q16rw33aNNMzFyFfBwYUAT3ajbo";
   }
 }
