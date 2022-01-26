@@ -6,7 +6,7 @@ import MerkleTree from "merkletreejs"; // MerkleTree.js
 import { useEffect, useState } from "react"; // React
 import { createContainer } from "unstated-next"; // State management
 
-const AIRDROP_INDEX = 0;
+const AIRDROP_INDEX = 1;
 
 /**
  * Generate Merkle Tree leaf from address and value
