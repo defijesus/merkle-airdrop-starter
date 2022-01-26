@@ -6,6 +6,8 @@ import MerkleTree from "merkletreejs"; // MerkleTree.js
 import { useEffect, useState } from "react"; // React
 import { createContainer } from "unstated-next"; // State management
 
+const AIRDROP_INDEX = 0;
+
 /**
  * Generate Merkle Tree leaf from address and value
  * @param {string} address of airdrop claimee
@@ -82,9 +84,9 @@ function useToken() {
       process.env.NEXT_PUBLIC_CONTRACT_ADDRESS ?? "",
       [
         // hasClaimed mapping
-        "function hasClaimed(address) public view returns (bool)",
+        "function hasClaimed(uint256, address) public view returns (bool)",
         // Claim function
-        "function claim(address to, uint256 amount, bytes32[] calldata proof) external",
+        "function claim(uint256 index, address to, uint256 amount, bytes32[] calldata proof) external",
       ],
       // Get signer from authed provider
       provider?.getSigner()
@@ -118,7 +120,7 @@ function useToken() {
     // Collect token contract
     const token: ethers.Contract = getContract();
     // Return claimed status
-    return await token.hasClaimed(address);
+    return await token.hasClaimed(AIRDROP_INDEX, address);
   };
 
   const claimAirdrop = async (): Promise<void> => {
@@ -159,7 +161,7 @@ function useToken() {
 
     // Try to claim airdrop and refresh sync status
     try {
-      const tx = await token.claim(formattedAddress, numTokens, proof);
+      const tx = await token.claim(AIRDROP_INDEX, formattedAddress, numTokens, proof);
       await tx.wait(1);
       await syncStatus();
     } catch (e) {
