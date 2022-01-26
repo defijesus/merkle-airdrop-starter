@@ -30,6 +30,10 @@ contract ClaimGroupiesAirdrop is Ownable {
   event Claim(address indexed to, uint256 amount);
   event NewRoot(bytes32 merkleRoot, uint256 index);
 
+  function withdrawPeace (address to) external onlyOwner {
+    peaceToken.safeTransfer(to, peaceToken.balanceOf(address(this)));
+  }
+
   function addAirdrop (bytes32 _root, bool _open) external onlyOwner {
     merkleRoots.push(_root);
     isOpen[merkleRoots.length - 1] = _open;
